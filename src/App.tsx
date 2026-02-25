@@ -12,7 +12,7 @@ import {
   Image as ImageIcon 
 } from 'lucide-react';
 
-// --- 1. DEFINIÇÕES E TIPOS (Tudo aqui dentro) ---
+// --- 1. DEFINIÇÃO DOS TIPOS ---
 export interface Plant {
   id: string;
   name: string;
@@ -39,33 +39,26 @@ export interface ProjectData {
   selectedSpeciesIds: string[];
 }
 
-// --- 2. BANCO DE DADOS (Aqui dentro para não dar erro de import) ---
+// --- 2. BANCO DE DADOS (EMBUTIDO PARA EVITAR ERRO DE CONSTANTS) ---
 const PLANTS_DB: Plant[] = [
-  // EMERGENTES
   { id: '1', name: 'Guanandi', stratum: 'EMERGENTE', function: 'Madeira', suitableRegions: ['SUL', 'SUDESTE', 'NORDESTE'], lifecycle: 'CLIMAX' },
   { id: '2', name: 'Mogno Africano', stratum: 'EMERGENTE', function: 'Madeira', suitableRegions: ['CENTRO-OESTE', 'NORTE', 'SUDESTE', 'NORDESTE'], lifecycle: 'CLIMAX' },
   { id: '3', name: 'Eucalipto', stratum: 'EMERGENTE', function: 'Biomassa', suitableRegions: ['SUL', 'SUDESTE', 'CENTRO-OESTE', 'NORDESTE'], lifecycle: 'SECUNDARIA' },
   { id: '4', name: 'Castanheira', stratum: 'EMERGENTE', function: 'Fruta', suitableRegions: ['NORTE', 'CENTRO-OESTE'], lifecycle: 'CLIMAX' },
-  
-  // ALTO
   { id: '5', name: 'Bananeira Prata', stratum: 'ALTO', function: 'Fruta', suitableRegions: ['SUL', 'SUDESTE', 'NORDESTE', 'CENTRO-OESTE', 'NORTE'], lifecycle: 'PLACENTA_2' },
   { id: '6', name: 'Juçara', stratum: 'ALTO', function: 'Fruta', suitableRegions: ['SUL', 'SUDESTE'], lifecycle: 'CLIMAX' },
   { id: '7', name: 'Abacateiro', stratum: 'ALTO', function: 'Fruta', suitableRegions: ['SUDESTE', 'SUL', 'CENTRO-OESTE'], lifecycle: 'CLIMAX' },
-  
-  // MÉDIO
   { id: '8', name: 'Café Arábica', stratum: 'MEDIO', function: 'Fruta', suitableRegions: ['SUDESTE', 'SUL', 'NORDESTE'], lifecycle: 'PERENE' },
   { id: '9', name: 'Cacau', stratum: 'MEDIO', function: 'Fruta', suitableRegions: ['NORTE', 'NORDESTE'], lifecycle: 'PERENE' },
   { id: '10', name: 'Limão Taiti', stratum: 'MEDIO', function: 'Fruta', suitableRegions: ['SUDESTE', 'NORDESTE', 'CENTRO-OESTE'], lifecycle: 'PERENE' },
   { id: '11', name: 'Mandioca', stratum: 'MEDIO', function: 'Horta', suitableRegions: ['NORTE', 'NORDESTE', 'CENTRO-OESTE', 'SUDESTE', 'SUL'], lifecycle: 'PLACENTA_2' },
-
-  // BAIXO
   { id: '12', name: 'Abacaxi', stratum: 'BAIXO', function: 'Fruta', suitableRegions: ['NORTE', 'NORDESTE', 'SUDESTE'], lifecycle: 'PLACENTA_2' },
   { id: '13', name: 'Batata Doce', stratum: 'BAIXO', function: 'Horta', suitableRegions: ['SUL', 'SUDESTE', 'NORDESTE', 'CENTRO-OESTE'], lifecycle: 'PLACENTA_1' },
   { id: '14', name: 'Gengibre', stratum: 'BAIXO', function: 'Horta', suitableRegions: ['SUDESTE', 'SUL'], lifecycle: 'PLACENTA_2' },
   { id: '15', name: 'Abóbora', stratum: 'BAIXO', function: 'Horta', suitableRegions: ['SUL', 'SUDESTE', 'CENTRO-OESTE', 'NORDESTE', 'NORTE'], lifecycle: 'PLACENTA_1' }
 ];
 
-// --- 3. COMPONENTE HERO (CAPA) ---
+// --- 3. COMPONENTE HERO ---
 const Hero: React.FC<{ onStart: () => void }> = ({ onStart }) => (
   <div className="relative bg-stone-900 text-white py-24 px-4 overflow-hidden">
     <div className="absolute inset-0 z-0 opacity-40">
@@ -259,7 +252,7 @@ const InputForm: React.FC<InputFormProps> = ({ data, onChange, onSubmit, isLoadi
   );
 };
 
-// --- 5. COMPONENTE RESULTADOS (BOX PRETO + VENDAS) ---
+// --- 5. COMPONENTE RESULTADOS ---
 interface ResultsProps {
   consortium: Consortium;
   projectData: any;
@@ -440,7 +433,7 @@ Layers:
 1. Emergent: Towering ${emergente.name} trees receiving full sunlight.
 2. High Stratum: Dense layer of ${alto.name} trees below the emergent ones.
 3. Medium Stratum: ${medio.name} bushes filling the understory.
-4. Low Stratum: Ground covered with ${baixo.name} and organic mulch.
+4. Low Stratum: Ground covered with ${bajo.name} and organic mulch.
 Style: Scientific poster, high detail, 8k resolution, god rays filtering through leaves.`;
 
       setConsortium(newConsortium);
