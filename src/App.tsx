@@ -85,3 +85,122 @@ const InputForm = ({ data, onChange, onSubmit, isLoading }: any) => {
                 <select className="w-full pl-10 p-3 border-2 border-stone-100 rounded-xl outline-none focus:border-green-500 appearance-none" value={data.biome} onChange={e => onChange({...data, biome: e.target.value})}>
                     <option value="Mata Atlântica">Mata Atlântica</option>
                     <option value="Cerrado">Cerrado</option>
+                    <option value="Amazônia">Amazônia</option>
+                </select>
+            </div>
+          </div>
+        </div>
+
+        <label className="block text-sm font-bold text-stone-700 mb-4 uppercase">Objetivo da Produção</label>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+          {focusOptions.map(opt => (
+            <button
+              key={opt.id}
+              onClick={() => {
+                const focus = data.focus.includes(opt.id) ? data.focus.filter((f: any) => f !== opt.id) : [...data.focus, opt.id];
+                onChange({...data, focus});
+              }}
+              className={`p-4 border-2 rounded-xl flex flex-col items-center gap-2 transition-all ${data.focus.includes(opt.id) ? 'border-green-500 bg-green-50 text-green-700' : 'border-stone-100 text-stone-500'}`}
+            >
+              <span className="text-3xl">{opt.icon}</span>
+              <span className="font-bold text-xs uppercase tracking-widest">{opt.label}</span>
+            </button>
+          ))}
+        </div>
+
+        <button onClick={onSubmit} disabled={isLoading || data.focus.length === 0} className="w-full py-5 bg-green-700 text-white font-bold rounded-xl shadow-lg hover:bg-green-800 transition-all flex justify-center items-center text-lg">
+          {isLoading ? <><Loader2 className="animate-spin mr-2" /> Calculando...</> : 'GERAR MEU PLANO'}
+        </button>
+      </div>
+    </section>
+  );
+};
+
+// --- 4. COMPONENTE RESULTADOS ---
+const Results = ({ consortium, projectData, prompt }: any) => {
+  return (
+    <section className="py-12 px-4 max-w-4xl mx-auto">
+      <div className="text-center mb-8">
+        <h2 className="text-3xl font-bold text-stone-800">Resultado Personalizado</h2>
+      </div>
+
+      <div className="bg-slate-900 rounded-3xl p-6 mb-8 border border-slate-800 shadow-xl text-center overflow-hidden">
+        <div className="inline-block bg-green-500/10 p-4 rounded-full mb-4">
+            <ImageIcon className="w-10 h-10 text-green-500 animate-pulse" />
+        </div>
+        <h3 className="text-white text-lg font-bold">Visualização do Ecossistema</h3>
+        <p className="text-stone-400 text-sm mt-3 px-4 italic">
+            "{prompt}"
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
+        {[
+          { label: 'Emergente', name: consortium.emergente.name, icon: <TreeDeciduous/> },
+          { label: 'Alto', name: consortium.alto.name, icon: <TreeDeciduous/> },
+          { label: 'Médio', name: consortium.medio.name, icon: <Leaf/> },
+          { label: 'Baixo', name: consortium.baixo.name, icon: <Carrot/> }
+        ].map((item, i) => (
+          <div key={i} className="bg-white p-5 rounded-2xl border border-stone-100 flex items-center shadow-sm">
+            <div className="mr-4 text-green-600 bg-green-50 p-3 rounded-xl">{item.icon}</div>
+            <div>
+              <p className="text-[10px] uppercase font-bold text-stone-400 tracking-tighter">{item.label}</p>
+              <p className="font-bold text-lg text-stone-800">{item.name}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="bg-stone-900 rounded-3xl p-10 text-center text-white border-t-4 border-green-600">
+        <Lock className="mx-auto mb-4 text-green-500 w-10 h-10" />
+        <h3 className="text-xl font-bold mb-6">Guia Completo de Implementação</h3>
+        <button onClick={() => window.open('https://pay.hotmart.com/V98127357T?off=m0f73v7g', '_blank')} className="px-10 py-4 bg-green-600 rounded-xl font-bold hover:bg-green-500 transition-all uppercase tracking-widest shadow-lg shadow-green-900/40">
+          Obter Guia Completo
+        </button>
+      </div>
+    </section>
+  );
+};
+
+// --- APP ---
+function App() {
+  const [step, setStep] = useState<'hero' | 'form' | 'results'>('hero');
+  const [isLoading, setIsLoading] = useState(false);
+  const [data, setData] = useState({ projectName: '', areaSize: 0, biome: 'Mata Atlântica', region: 'SUDESTE', focus: [] });
+  const [consortium, setConsortium] = useState<any>(null);
+  const [prompt, setPrompt] = useState('');
+
+  const runAlgorithm = () => {
+    setIsLoading(true);
+    setTimeout(() => {
+      const reg = PLANTS_DB.filter(p => p.suitableRegions.includes(data.region));
+      const getP = (s: string) => reg.find(p => p.stratum === s) || PLANTS_DB.find(p => p.stratum === s)!;
+      
+      const em = getP('EMERGENTE');
+      const al = getP('ALTO');
+      const me = getP('MEDIO');
+      const ba = getP('BAIXO');
+
+      setConsortium({ emergente: em, alto: al, medio: me, baixo: ba });
+      setPrompt(`Uma ilustração realista em 8K de um sistema agroflorestal no bioma ${data.biome}. Espécies Principais: ${em.name}, ${al.name}, ${me.name} e ${ba.name}.`);
+      
+      setIsLoading(false);
+      setStep('results');
+    }, 1500);
+  };
+
+  return (
+    <div className="min-h-screen bg-stone-50">
+      <nav className="bg-white border-b p-4 flex justify-center sticky top-0 z-50">
+        <div className="flex items-center font-bold text-xl text-green-800 tracking-tighter uppercase">
+          <Leaf className="mr-2 text-green-600" /> SINTROPLAN
+        </div>
+      </nav>
+      {step === 'hero' && <Hero onStart={() => setStep('form')} />}
+      {step === 'form' && <InputForm data={data} onChange={setData} onSubmit={runAlgorithm} isLoading={isLoading} />}
+      {step === 'results' && consortium && <Results consortium={consortium} projectData={data} prompt={prompt} onUnlock={() => window.open('https://pay.hotmart.com/V98127357T?off=m0f73v7g', '_blank')} />}
+    </div>
+  );
+}
+
+export default App;
