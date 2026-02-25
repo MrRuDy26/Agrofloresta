@@ -12,7 +12,7 @@ import {
   Image as ImageIcon 
 } from 'lucide-react';
 
-// --- 1. BANCO DE DADOS E TIPOS ---
+// --- 1. BANCO DE DADOS ---
 const PLANTS_DB = [
   { id: '1', name: 'Guanandi', stratum: 'EMERGENTE', suitableRegions: ['SUL', 'SUDESTE', 'NORDESTE'] },
   { id: '2', name: 'Mogno Africano', stratum: 'EMERGENTE', suitableRegions: ['CENTRO-OESTE', 'NORTE', 'SUDESTE', 'NORDESTE'] },
@@ -26,7 +26,7 @@ const PLANTS_DB = [
 ];
 
 // --- 2. COMPONENTE HERO ---
-const Hero: React.FC<{ onStart: () => void }> = ({ onStart }) => (
+const Hero = ({ onStart }: any) => (
   <div className="relative bg-stone-900 text-white py-24 px-4">
     <div className="absolute inset-0 z-0 opacity-40">
        <img src="https://images.unsplash.com/photo-1598555848386-302380596377?auto=format&fit=crop&w=1200&q=80" alt="Agrofloresta" className="w-full h-full object-cover" />
@@ -56,38 +56,28 @@ const InputForm = ({ data, onChange, onSubmit, isLoading }: any) => {
     <section className="py-12 px-4 bg-stone-50">
       <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl p-6 md:p-10 border border-stone-100">
         <h2 className="text-2xl font-bold text-stone-800 mb-8 text-center uppercase tracking-tight">Configuração do Sistema</h2>
-        
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div>
             <label className="block text-sm font-bold text-stone-700 mb-2">Área (m²)</label>
-            <div className="relative">
-                <Ruler className="absolute left-3 top-3.5 h-4 w-4 text-stone-400" />
-                <input type="number" className="w-full pl-10 p-3 border-2 border-stone-100 rounded-xl outline-none focus:border-green-500" value={data.areaSize || ''} onChange={e => onChange({...data, areaSize: Number(e.target.value)})} />
-            </div>
+            <input type="number" className="w-full p-3 border-2 border-stone-100 rounded-xl outline-none focus:border-green-500" value={data.areaSize || ''} onChange={e => onChange({...data, areaSize: Number(e.target.value)})} />
           </div>
           <div>
             <label className="block text-sm font-bold text-stone-700 mb-2">Região</label>
-            <div className="relative">
-                <MapPin className="absolute left-3 top-3.5 h-4 w-4 text-stone-400" />
-                <select className="w-full pl-10 p-3 border-2 border-stone-100 rounded-xl outline-none focus:border-green-500 appearance-none" value={data.region} onChange={e => onChange({...data, region: e.target.value})}>
-                    <option value="SUDESTE">SUDESTE</option>
-                    <option value="SUL">SUL</option>
-                    <option value="NORTE">NORTE</option>
-                    <option value="NORDESTE">NORDESTE</option>
-                    <option value="CENTRO-OESTE">CENTRO-OESTE</option>
-                </select>
-            </div>
+            <select className="w-full p-3 border-2 border-stone-100 rounded-xl outline-none focus:border-green-500" value={data.region} onChange={e => onChange({...data, region: e.target.value})}>
+                <option value="SUDESTE">SUDESTE</option>
+                <option value="SUL">SUL</option>
+                <option value="NORTE">NORTE</option>
+                <option value="NORDESTE">NORDESTE</option>
+                <option value="CENTRO-OESTE">CENTRO-OESTE</option>
+            </select>
           </div>
           <div>
             <label className="block text-sm font-bold text-stone-700 mb-2">Bioma</label>
-            <div className="relative">
-                <Mountain className="absolute left-3 top-3.5 h-4 w-4 text-stone-400" />
-                <select className="w-full pl-10 p-3 border-2 border-stone-100 rounded-xl outline-none focus:border-green-500 appearance-none" value={data.biome} onChange={e => onChange({...data, biome: e.target.value})}>
-                    <option value="Mata Atlântica">Mata Atlântica</option>
-                    <option value="Cerrado">Cerrado</option>
-                    <option value="Amazônia">Amazônia</option>
-                </select>
-            </div>
+            <select className="w-full p-3 border-2 border-stone-100 rounded-xl outline-none focus:border-green-500" value={data.biome} onChange={e => onChange({...data, biome: e.target.value})}>
+                <option value="Mata Atlântica">Mata Atlântica</option>
+                <option value="Cerrado">Cerrado</option>
+                <option value="Amazônia">Amazônia</option>
+            </select>
           </div>
         </div>
 
@@ -109,29 +99,35 @@ const InputForm = ({ data, onChange, onSubmit, isLoading }: any) => {
         </div>
 
         <button onClick={onSubmit} disabled={isLoading || data.focus.length === 0} className="w-full py-5 bg-green-700 text-white font-bold rounded-xl shadow-lg hover:bg-green-800 transition-all flex justify-center items-center text-lg">
-          {isLoading ? <><Loader2 className="animate-spin mr-2" /> Calculando...</> : 'GERAR MEU PLANO'}
+          {isLoading ? <><Loader2 className="animate-spin mr-2" /> Analisando Dados...</> : 'GERAR MEU PLANO'}
         </button>
       </div>
     </section>
   );
 };
 
-// --- 4. COMPONENTE RESULTADOS ---
+// --- 5. COMPONENTE RESULTADOS ---
 const Results = ({ consortium, projectData, prompt }: any) => {
   return (
     <section className="py-12 px-4 max-w-4xl mx-auto">
       <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-stone-800">Resultado Personalizado</h2>
+        <h2 className="text-3xl font-bold text-stone-800 tracking-tight">Seu Design Sintrópico</h2>
       </div>
 
-      <div className="bg-slate-900 rounded-3xl p-6 mb-8 border border-slate-800 shadow-xl text-center overflow-hidden">
-        <div className="inline-block bg-green-500/10 p-4 rounded-full mb-4">
-            <ImageIcon className="w-10 h-10 text-green-500 animate-pulse" />
+      {/* AQUI ESTÁ A CORREÇÃO: IMAGEM REAL EM VEZ DE SÓ TEXTO */}
+      <div className="relative group mb-12 rounded-3xl overflow-hidden shadow-2xl border-4 border-white">
+        <div className="absolute inset-0 bg-black/40 z-10 flex flex-col items-center justify-center p-6 text-center">
+             <div className="bg-green-500 p-3 rounded-full mb-4 animate-bounce">
+                <ImageIcon className="w-8 h-8 text-white" />
+             </div>
+             <p className="text-white font-bold text-xl drop-shadow-md">Esboço Visual do Consórcio</p>
+             <p className="text-green-200 text-xs mt-2 max-w-sm italic">"{prompt}"</p>
         </div>
-        <h3 className="text-white text-lg font-bold">Visualização do Ecossistema</h3>
-        <p className="text-stone-400 text-sm mt-3 px-4 italic">
-            "{prompt}"
-        </p>
+        <img 
+            src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=1000&q=80" 
+            alt="Esboço Agrofloresta" 
+            className="w-full aspect-video object-cover"
+        />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
@@ -153,9 +149,9 @@ const Results = ({ consortium, projectData, prompt }: any) => {
 
       <div className="bg-stone-900 rounded-3xl p-10 text-center text-white border-t-4 border-green-600">
         <Lock className="mx-auto mb-4 text-green-500 w-10 h-10" />
-        <h3 className="text-xl font-bold mb-6">Guia Completo de Implementação</h3>
-        <button onClick={() => window.open('https://pay.hotmart.com/V98127357T?off=m0f73v7g', '_blank')} className="px-10 py-4 bg-green-600 rounded-xl font-bold hover:bg-green-500 transition-all uppercase tracking-widest shadow-lg shadow-green-900/40">
-          Obter Guia Completo
+        <h3 className="text-xl font-bold mb-6 uppercase tracking-widest">Acesse o Passo a Passo Completo</h3>
+        <button onClick={() => window.open('https://pay.hotmart.com/V98127357T?off=m0f73v7g', '_blank')} className="px-10 py-4 bg-green-600 rounded-xl font-bold hover:bg-green-500 transition-all shadow-lg shadow-green-900/40">
+          QUERO O GUIA DE IMPLEMENTAÇÃO
         </button>
       </div>
     </section>
@@ -182,7 +178,7 @@ function App() {
       const ba = getP('BAIXO');
 
       setConsortium({ emergente: em, alto: al, medio: me, baixo: ba });
-      setPrompt(`Uma ilustração realista em 8K de um sistema agroflorestal no bioma ${data.biome}. Espécies Principais: ${em.name}, ${al.name}, ${me.name} e ${ba.name}.`);
+      setPrompt(`Sistema: ${em.name} + ${al.name} + ${me.name} + ${ba.name}. Bioma: ${data.biome}.`);
       
       setIsLoading(false);
       setStep('results');
@@ -191,13 +187,13 @@ function App() {
 
   return (
     <div className="min-h-screen bg-stone-50">
-      <nav className="bg-white border-b p-4 flex justify-center sticky top-0 z-50">
+      <nav className="bg-white border-b p-4 flex justify-center sticky top-0 z-50 shadow-sm">
         <div className="flex items-center font-bold text-xl text-green-800 tracking-tighter uppercase">
           <Leaf className="mr-2 text-green-600" /> SINTROPLAN
         </div>
       </nav>
       {step === 'hero' && <Hero onStart={() => setStep('form')} />}
-      {step === 'form' && <InputForm data={data} onChange={setData} onSubmit={runAlgorithm} isLoading={isLoading} />}
+      {step === 'form' && <InputForm data={data} onChange={setData} onSubmit={handleGenerate} isLoading={isLoading} />}
       {step === 'results' && consortium && <Results consortium={consortium} projectData={data} prompt={prompt} onUnlock={() => window.open('https://pay.hotmart.com/V98127357T?off=m0f73v7g', '_blank')} />}
     </div>
   );
