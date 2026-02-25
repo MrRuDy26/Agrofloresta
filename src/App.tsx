@@ -9,12 +9,8 @@ import {
   TreeDeciduous, 
   Carrot, 
   Lock, 
-  Image as ImageIcon,
-  Trees,
-  Apple,
-  Salad,
-  Wind
-} from 'lucide-center'; // Nota: se der erro de ícone, mude para 'lucide-react'
+  Image as ImageIcon 
+} from 'lucide-react';
 
 // --- BANCO DE DADOS ---
 const PLANTS_DB = [
@@ -29,12 +25,11 @@ const PLANTS_DB = [
 ];
 
 export default function App() {
-  const [view, setView] = useState('hero'); // 'hero', 'form', 'results'
+  const [view, setView] = useState('hero'); 
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState({ area: '', region: 'SUDESTE', biome: 'Mata Atlântica', focus: [] as string[] });
   const [result, setResult] = useState<any>(null);
 
-  // Função para gerar o plano
   const handleGenerate = () => {
     setLoading(true);
     setTimeout(() => {
@@ -54,14 +49,12 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-stone-50 font-sans">
-      {/* HEADER */}
       <nav className="bg-white border-b p-4 flex justify-center sticky top-0 z-50 shadow-sm">
         <div className="flex items-center font-bold text-xl text-green-800 uppercase tracking-tighter">
           <Leaf className="mr-2 text-green-600" /> SINTROPLAN
         </div>
       </nav>
 
-      {/* TELA 1: HERO */}
       {view === 'hero' && (
         <div className="relative bg-stone-900 text-white py-32 px-4 text-center">
           <div className="absolute inset-0 opacity-40">
@@ -77,7 +70,6 @@ export default function App() {
         </div>
       )}
 
-      {/* TELA 2: FORMULÁRIO */}
       {view === 'form' && (
         <div className="py-12 px-4 max-w-3xl mx-auto">
           <div className="bg-white rounded-3xl shadow-xl p-8 border border-stone-100">
@@ -107,11 +99,12 @@ export default function App() {
               {[ {id: 'Madeira', icon: '🪵'}, {id: 'Fruta', icon: '🍎'}, {id: 'Horta', icon: '🥬'}, {id: 'Biomassa', icon: '🌿'} ].map(opt => (
                 <button 
                   key={opt.id} 
+                  type="button"
                   onClick={() => setData({...data, focus: data.focus.includes(opt.id) ? data.focus.filter(f => f !== opt.id) : [...data.focus, opt.id]})}
                   className={`p-4 border-2 rounded-2xl flex flex-col items-center gap-2 transition-all ${data.focus.includes(opt.id) ? 'border-green-500 bg-green-50' : 'border-stone-100'}`}
                 >
                   <span className="text-3xl">{opt.icon}</span>
-                  <span className="font-bold text-xs uppercase">{opt.id}</span>
+                  <span className="font-bold text-xs uppercase text-stone-700">{opt.id}</span>
                 </button>
               ))}
             </div>
@@ -123,15 +116,16 @@ export default function App() {
         </div>
       )}
 
-      {/* TELA 3: RESULTADOS */}
       {view === 'results' && result && (
-        <div className="py-12 px-4 max-w-4xl mx-auto">
+        <div className="py-12 px-4 max-w-4xl mx-auto animate-in fade-in duration-500">
           <div className="bg-stone-900 rounded-[2.5rem] overflow-hidden shadow-2xl mb-8 relative">
             <img src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=1000" className="w-full aspect-video object-cover opacity-40" alt="Plano" />
             <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
               <ImageIcon className="w-12 h-12 text-green-500 mb-4 animate-pulse" />
               <h3 className="text-white text-2xl font-bold">Design do Sistema Gerado</h3>
-              <p className="text-stone-300 italic text-sm mt-2">"{result.emergente.name} + {result.alto.name} + {result.medio.name} + {result.baixo.name}"</p>
+              <p className="text-stone-300 italic text-sm mt-2">
+                Estratégia: {result.emergente.name} + {result.alto.name} + {result.medio.name} + {result.baixo.name}
+              </p>
             </div>
           </div>
 
@@ -146,7 +140,7 @@ export default function App() {
                 <div className="mr-4 text-green-600 bg-green-50 p-3 rounded-xl">{item.icon}</div>
                 <div>
                   <p className="text-[10px] uppercase font-black text-stone-400 tracking-widest">{item.label}</p>
-                  <p className="font-bold text-xl text-stone-800">{item.name}</p>
+                  <p className="font-bold text-lg text-stone-800">{item.name}</p>
                 </div>
               </div>
             ))}
@@ -154,7 +148,7 @@ export default function App() {
 
           <div className="bg-green-700 rounded-[2.5rem] p-10 text-center text-white shadow-xl">
             <Lock className="mx-auto mb-4 w-12 h-12" />
-            <h3 className="text-2xl font-bold mb-6">Guia Completo de Implementação</h3>
+            <h3 className="text-2xl font-bold mb-6 uppercase">Guia de Implementação</h3>
             <button onClick={() => window.open('https://pay.hotmart.com/V98127357T?off=m0f73v7g', '_blank')} className="px-10 py-4 bg-white text-green-700 rounded-xl font-bold hover:bg-stone-100 transition-all uppercase tracking-widest">
               Acessar Guia Agora
             </button>
