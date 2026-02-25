@@ -39,7 +39,7 @@ export interface ProjectData {
   selectedSpeciesIds: string[];
 }
 
-// --- 2. BANCO DE DADOS (EMBUTIDO AQUI MESMO) ---
+// --- 2. BANCO DE DADOS ---
 const PLANTS_DB: Plant[] = [
   { id: '1', name: 'Guanandi', stratum: 'EMERGENTE', function: 'Madeira', suitableRegions: ['SUL', 'SUDESTE', 'NORDESTE'], lifecycle: 'CLIMAX' },
   { id: '2', name: 'Mogno Africano', stratum: 'EMERGENTE', function: 'Madeira', suitableRegions: ['CENTRO-OESTE', 'NORTE', 'SUDESTE', 'NORDESTE'], lifecycle: 'CLIMAX' },
@@ -78,7 +78,7 @@ const Hero: React.FC<{ onStart: () => void }> = ({ onStart }) => (
   </div>
 );
 
-// --- 4. COMPONENTE FORMULÁRIO (INPUT) ---
+// --- 4. COMPONENTE FORMULÁRIO ---
 interface InputFormProps {
   data: ProjectData;
   onChange: (data: ProjectData) => void;
@@ -319,174 +319,4 @@ const Results: React.FC<ResultsProps> = ({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-          {Object.entries(consortium).map(([key, value]) => {
-            if (key === 'horta' && Array.isArray(value)) return null; 
-            const plant = value as any;
-            if (!plant || !strataConfig[key as keyof typeof strataConfig]) return null;
-            
-            const config = strataConfig[key as keyof typeof strataConfig];
-            const Icon = config.icon;
-
-            return (
-              <div key={key} className="bg-white rounded-3xl shadow-xl p-5 border border-stone-100 flex items-center">
-                 <div className={`p-3 rounded-2xl mr-4 ${config.bgColor} ${config.color}`}>
-                      <Icon className="h-6 w-6" />
-                 </div>
-                 <div>
-                    <h4 className="text-xs uppercase font-bold text-stone-400 tracking-wider">{config.label}</h4>
-                    <p className="text-xl font-bold text-stone-800">{plant.name}</p>
-                 </div>
-              </div>
-            );
-          })}
-        </div>
-
-        <div className="bg-stone-900 rounded-3xl shadow-2xl p-8 sm:p-12 text-center relative overflow-hidden">
-            <div className="relative z-10">
-              <div className="inline-flex p-4 mb-6 bg-stone-800 rounded-full shadow-md border border-stone-700">
-                  <Lock className="h-10 w-10 text-green-500" />
-              </div>
-            <h3 className="text-3xl font-extrabold text-white mb-6">
-              Guia de Implementação Técnica
-            </h3>
-            <ul className="text-left inline-block mx-auto space-y-4 mb-10 text-stone-500">
-                <li className="flex items-center text-lg"><Lock className="h-5 w-5 mr-3"/> <span className="blur-sm">Espaçamento Otimizado</span></li>
-                <li className="flex items-center text-lg"><Lock className="h-5 w-5 mr-3"/> <span className="blur-sm">Cronograma de Poda</span></li>
-                <li className="flex items-center text-lg"><Lock className="h-5 w-5 mr-3"/> <span className="blur-sm">Receita de Adubação</span></li>
-            </ul>
-            <button
-              onClick={onUnlock}
-              className="px-8 py-4 text-lg font-extrabold rounded-2xl text-white bg-green-600 hover:bg-green-500 shadow-lg transform hover:scale-105 transition-all w-full sm:w-auto"
-            >
-              DESBLOQUEAR GUIA COMPLETO
-            </button>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};
-
-// --- 6. LÓGICA PRINCIPAL (APP) ---
-const App: React.FC = () => {
-  const [step, setStep] = useState<'hero' | 'form' | 'results'>('hero');
-  const [isLoading, setIsLoading] = useState(false);
-  const [isPro, setIsPro] = useState(false);
-
-  // Estados dos dados
-  const [projectData, setProjectData] = useState<ProjectData>({
-    projectName: '',
-    areaSize: 0,
-    biome: 'Mata Atlântica',
-    region: 'SUDESTE',
-    focus: [],
-    selectedSpeciesIds: []
-  });
-
-  const [consortium, setConsortium] = useState<Consortium | null>(null);
-  
-  const [aiExtras, setAiExtras] = useState<{
-    image_prompt: string;
-    sales_hook: string;
-  }>({ image_prompt: '', sales_hook: '' });
-
-  const handleStart = () => {
-    setStep('form');
-    setTimeout(() => {
-      const formElement = document.getElementById('planner-form');
-      if (formElement) formElement.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
-  };
-
-  const handleUnlock = () => {
-    // COLOQUE SEU LINK DE AFILIADO AQUI
-    window.open('https://pay.hotmart.com/SEU_LINK', '_blank');
-  };
-
-  const generateConsortium = () => {
-    setIsLoading(true);
-
-    setTimeout(() => {
-      // Lógica Simples Local
-      const regionalPlants = PLANTS_DB.filter(p => p.suitableRegions.includes(projectData.region));
-      const userSelectedPlants = regionalPlants.filter(p => projectData.selectedSpeciesIds.includes(p.id));
-
-      const pickBest = (stratum: string): Plant => {
-        const userChoice = userSelectedPlants.find(p => p.stratum === stratum);
-        if (userChoice) return userChoice;
-        const candidates = regionalPlants.filter(p => p.stratum === stratum);
-        // Fallback genérico se não encontrar planta
-        if (candidates.length === 0) return { id: 'gen', name: 'Nativa Local', stratum: stratum as any, function: 'Biomassa', suitableRegions: [], lifecycle: 'PERENE' };
-        return candidates[0];
-      };
-
-      const emergente = pickBest('EMERGENTE');
-      const alto = pickBest('ALTO');
-      const medio = pickBest('MEDIO');
-      const baixo = pickBest('BAIXO');
-      
-      const newConsortium = { emergente, alto, medio, baixo, horta: [] };
-
-      // GERA O TEXTO DO PROMPT (INGLÊS)
-      const promptText = `An educational, realistic cross-section botanical illustration of a syntropic agroforestry system in the ${projectData.biome} biome. 
-Layers:
-1. Emergent: Towering ${emergente.name} trees receiving full sunlight.
-2. High Stratum: Dense layer of ${alto.name} trees below the emergent ones.
-3. Medium Stratum: ${medio.name} bushes filling the understory.
-4. Low Stratum: Ground covered with ${bajo.name} and organic mulch.
-Style: Scientific poster, high detail, 8k resolution, god rays filtering through leaves.`;
-
-      setConsortium(newConsortium);
-      setAiExtras({
-        image_prompt: promptText,
-        sales_hook: ''
-      });
-      
-      setIsLoading(false);
-      setStep('results');
-    }, 1500);
-  };
-
-  return (
-    <div className="min-h-screen flex flex-col font-sans bg-stone-50">
-      <nav className="bg-white border-b border-stone-200 py-4 px-4 sm:px-8 flex justify-between items-center sticky top-0 z-50">
-        <div className="flex items-center space-x-2 cursor-pointer" onClick={() => setStep('hero')}>
-          <div className="bg-green-700 p-2 rounded-lg">
-             <Leaf className="text-white h-5 w-5" />
-          </div>
-          <span className="text-xl font-bold text-stone-800 tracking-tight">SintroPlan</span>
-        </div>
-      </nav>
-
-      <main className="flex-grow">
-        {step === 'hero' && <Hero onStart={handleStart} />}
-        
-        {step === 'form' && (
-          <InputForm 
-            data={projectData} 
-            onChange={setProjectData} 
-            onSubmit={generateConsortium}
-            isLoading={isLoading}
-          />
-        )}
-
-        {step === 'results' && consortium && (
-          <Results 
-            consortium={consortium} 
-            projectData={projectData} 
-            isPro={isPro}
-            onUnlock={handleUnlock}
-            image_prompt={aiExtras.image_prompt}
-            sales_hook={aiExtras.sales_hook}
-          />
-        )}
-      </main>
-
-      <footer className="bg-stone-900 text-stone-400 py-8 px-4 text-center text-sm border-t border-stone-800">
-        <p>© {new Date().getFullYear()} SintroPlan.</p>
-      </footer>
-    </div>
-  );
-};
-
-export default App;
+          {Object.entries
