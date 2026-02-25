@@ -12,7 +12,7 @@ import {
   Image as ImageIcon 
 } from 'lucide-react';
 
-// --- 1. DEFINIÇÃO DOS TIPOS (Para não depender de types.ts) ---
+// --- 1. DEFINIÇÕES E TIPOS (Tudo aqui dentro) ---
 export interface Plant {
   id: string;
   name: string;
@@ -39,7 +39,7 @@ export interface ProjectData {
   selectedSpeciesIds: string[];
 }
 
-// --- 2. BANCO DE DADOS EMBUTIDO (Para não depender de constants.ts e corrigir o erro) ---
+// --- 2. BANCO DE DADOS (Aqui dentro para não dar erro de import) ---
 const PLANTS_DB: Plant[] = [
   // EMERGENTES
   { id: '1', name: 'Guanandi', stratum: 'EMERGENTE', function: 'Madeira', suitableRegions: ['SUL', 'SUDESTE', 'NORDESTE'], lifecycle: 'CLIMAX' },
@@ -65,7 +65,27 @@ const PLANTS_DB: Plant[] = [
   { id: '15', name: 'Abóbora', stratum: 'BAIXO', function: 'Horta', suitableRegions: ['SUL', 'SUDESTE', 'CENTRO-OESTE', 'NORDESTE', 'NORTE'], lifecycle: 'PLACENTA_1' }
 ];
 
-// --- 3. COMPONENTE INPUT FORM ---
+// --- 3. COMPONENTE HERO (CAPA) ---
+const Hero: React.FC<{ onStart: () => void }> = ({ onStart }) => (
+  <div className="relative bg-stone-900 text-white py-24 px-4 overflow-hidden">
+    <div className="absolute inset-0 z-0 opacity-40">
+       <img src="https://images.unsplash.com/photo-1598555848386-302380596377?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80" alt="Agrofloresta" className="w-full h-full object-cover" />
+    </div>
+    <div className="relative z-10 max-w-4xl mx-auto text-center">
+      <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight mb-6">
+        Planeje sua <span className="text-green-400">Agrofloresta</span> em Segundos
+      </h1>
+      <p className="text-xl text-stone-300 mb-10 max-w-2xl mx-auto">
+        Inteligência Artificial aplicada à Agricultura Sintrópica.
+      </p>
+      <button onClick={onStart} className="px-8 py-4 bg-green-600 hover:bg-green-500 text-white font-bold rounded-full text-lg shadow-lg transform hover:scale-105 transition-all">
+        Começar Projeto Gratuito
+      </button>
+    </div>
+  </div>
+);
+
+// --- 4. COMPONENTE FORMULÁRIO (INPUT) ---
 interface InputFormProps {
   data: ProjectData;
   onChange: (data: ProjectData) => void;
@@ -239,7 +259,7 @@ const InputForm: React.FC<InputFormProps> = ({ data, onChange, onSubmit, isLoadi
   );
 };
 
-// --- 4. COMPONENTE RESULTS ---
+// --- 5. COMPONENTE RESULTADOS (BOX PRETO + VENDAS) ---
 interface ResultsProps {
   consortium: Consortium;
   projectData: any;
@@ -354,27 +374,7 @@ const Results: React.FC<ResultsProps> = ({
   );
 };
 
-// --- 5. COMPONENTE HERO ---
-const Hero: React.FC<{ onStart: () => void }> = ({ onStart }) => (
-  <div className="relative bg-stone-900 text-white py-24 px-4 overflow-hidden">
-    <div className="absolute inset-0 z-0 opacity-40">
-       <img src="https://images.unsplash.com/photo-1598555848386-302380596377?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80" alt="Agrofloresta" className="w-full h-full object-cover" />
-    </div>
-    <div className="relative z-10 max-w-4xl mx-auto text-center">
-      <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight mb-6">
-        Planeje sua <span className="text-green-400">Agrofloresta</span> em Segundos
-      </h1>
-      <p className="text-xl text-stone-300 mb-10 max-w-2xl mx-auto">
-        Inteligência Artificial aplicada à Agricultura Sintrópica.
-      </p>
-      <button onClick={onStart} className="px-8 py-4 bg-green-600 hover:bg-green-500 text-white font-bold rounded-full text-lg shadow-lg transform hover:scale-105 transition-all">
-        Começar Projeto Gratuito
-      </button>
-    </div>
-  </div>
-);
-
-// --- 6. LÓGICA PRINCIPAL DO APP ---
+// --- 6. LÓGICA PRINCIPAL (APP) ---
 const App: React.FC = () => {
   const [step, setStep] = useState<'hero' | 'form' | 'results'>('hero');
   const [isLoading, setIsLoading] = useState(false);
@@ -440,7 +440,7 @@ Layers:
 1. Emergent: Towering ${emergente.name} trees receiving full sunlight.
 2. High Stratum: Dense layer of ${alto.name} trees below the emergent ones.
 3. Medium Stratum: ${medio.name} bushes filling the understory.
-4. Low Stratum: Ground covered with ${bajo.name} and organic mulch.
+4. Low Stratum: Ground covered with ${baixo.name} and organic mulch.
 Style: Scientific poster, high detail, 8k resolution, god rays filtering through leaves.`;
 
       setConsortium(newConsortium);
