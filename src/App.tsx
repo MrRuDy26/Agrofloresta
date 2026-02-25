@@ -39,7 +39,7 @@ export interface ProjectData {
   selectedSpeciesIds: string[];
 }
 
-// --- 2. BANCO DE DADOS (EMBUTIDO PARA EVITAR ERRO DE CONSTANTS) ---
+// --- 2. BANCO DE DADOS (EMBUTIDO AQUI MESMO) ---
 const PLANTS_DB: Plant[] = [
   { id: '1', name: 'Guanandi', stratum: 'EMERGENTE', function: 'Madeira', suitableRegions: ['SUL', 'SUDESTE', 'NORDESTE'], lifecycle: 'CLIMAX' },
   { id: '2', name: 'Mogno Africano', stratum: 'EMERGENTE', function: 'Madeira', suitableRegions: ['CENTRO-OESTE', 'NORTE', 'SUDESTE', 'NORDESTE'], lifecycle: 'CLIMAX' },
