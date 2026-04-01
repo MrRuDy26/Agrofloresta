@@ -15,21 +15,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    // 1. Verificar sessão atual ao carregar
+    const getInitialSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        setUser(session?.user ?? null);
+      } catch (error) {
+        console.error("Erro ao carregar sessão:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    getInitialSession();
+
+    // 2. Ouvir mudanças (Login/Logout) em tempo real
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log("Mudança de Auth detectada:", _event);
       setUser(session?.user ?? null);
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signOut = async () => {
     await supabase.auth.signOut();
+    window.location.href = '/'; // Força o refresh ao sair
   };
 
   return (
