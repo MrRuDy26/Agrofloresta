@@ -1,26 +1,38 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { FormData, PlanResult } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+// Suporta tanto o padrão do Node (process.env) quanto do Vite (import.meta.env)
+const apiKey = typeof process !== 'undefined' && process.env.GEMINI_API_KEY 
+  ? process.env.GEMINI_API_KEY 
+  // @ts-ignore
+  : import.meta.env.VITE_GEMINI_API_KEY;
+
+const ai = new GoogleGenAI({ apiKey: apiKey });
 
 export async function generatePlan(data: FormData): Promise<PlanResult> {
   const prompt = `
-    Act as an expert agroforestry consultant.
-    Generate a highly profitable agroforestry consortium plan based on the following parameters:
-    Biome: ${data.biome}
-    Region: ${data.region}
-    Focus: ${data.focus}
-    Area Size: ${data.areaSize}
+    Atue como um Engenheiro Agrônomo especialista em Agricultura Sintrópica (método Ernst Götsch).
+    Você deve gerar um plano de consórcio altamente lucrativo e otimizado com base nestes parâmetros:
+    
+    - Bioma: ${data.biome}
+    - Região: ${data.region}
+    - Foco do Produtor: ${data.focus}
+    - Tamanho da Área: ${data.areaSize}
 
-    Return a JSON with the following structure:
-    - consortium: List of plants organized by Stratum (Emergente, Alto, Médio, Baixo).
-    - image_prompt: A highly detailed English prompt to generate a realistic cross-section image of this specific consortium.
-    - sales_hook: A persuasive paragraph in Portuguese explaining why this combination is profitable but warning that execution is key.
-    - technical_secrets: A list of 3-4 topics (e.g., "Poda de Formação", "Adubação NPK") that will be "locked/blurred".
+    DIRETRIZES DE FOCO E SUCESSÃO:
+    1. Se o Foco for "Apenas Horta": Foque em hortaliças, raízes e plantas de serviço rápido (Placenta I e II).
+    2. Se o Foco for "Apenas Pomar": Foque em árvores frutíferas (Secundárias e Clímax) e árvores de biomassa (eucalipto, margaridão).
+    3. Se o Foco for "Misto (Horta + Pomar)": Crie um sistema completo. Inclua a horta nas bordas/entrelinhas para gerar caixa rápido, e o pomar no centro para o longo prazo.
+
+    Retorne APENAS um JSON válido com a seguinte estrutura:
+    - consortium: Lista das plantas ideais organizadas rigorosamente por Estrato (Emergente, Alto, Médio, Baixo).
+    - image_prompt: Um prompt EM INGLÊS altamente detalhado para uma IA geradora de imagens criar um diagrama/seção transversal (cross-section) realista deste canteiro.
+    - sales_hook: Um parágrafo persuasivo em português explicando por que essa combinação específica é muito lucrativa para a região de ${data.region}, mas crie urgência dizendo que o segredo está no momento exato do plantio e do manejo.
+    - technical_secrets: Uma lista de 3 a 4 nomes de relatórios técnicos avançados que o produtor precisaria (Ex: "Cronograma de Poda de Formação da Área", "Mapa de Plantio no Tempo", "Esquema de Adubação Verde").
   `;
 
   const response = await ai.models.generateContent({
-    model: "gemini-3-flash-preview",
+    model: "gemini-3-flash-preview", // Mantive o modelo que você já estava usando
     contents: prompt,
     config: {
       responseMimeType: "application/json",
@@ -48,8 +60,9 @@ export async function generatePlan(data: FormData): Promise<PlanResult> {
   });
 
   if (!response.text) {
-    throw new Error("Failed to generate plan");
+    throw new Error("Falha ao gerar o plano sintrópico.");
   }
 
+  // O response.text já volta como uma string JSON perfeita graças ao responseSchema
   return JSON.parse(response.text) as PlanResult;
 }
