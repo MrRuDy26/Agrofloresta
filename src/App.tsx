@@ -1,3 +1,10 @@
+import React, { useState } from 'react';
+import { 
+  Leaf, Sprout, Loader2, TreeDeciduous, Carrot, LogOut, LogIn
+} from 'lucide-react';
+
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { supabase } from './services/supabase';
 
 const PLANTS_DATA = {
   EMERGENTE: ['Eucalipto', 'Mogno Africano', 'Ipê Amarelo', 'Cedro Rosa'],
