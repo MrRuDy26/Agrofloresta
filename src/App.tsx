@@ -22,37 +22,61 @@ function AppContent() {
   const { user, signOut, loading: authLoading } = useAuth();
 
   const handleGoogleLogin = async () => {
-    // Aqui garantimos que ele sempre volte para a página atual, seja local ou na Vercel
     const redirectUrl = window.location.origin;
-    
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { 
         redirectTo: redirectUrl,
         queryParams: {
           access_type: 'offline',
-          prompt: 'consent',
+          // Removido o prompt:consent para login automático
         },
       }
     });
   };
 
-  const gerarPlano = () => {
+  const gerarPlano = async () => {
     setLoading(true);
+    
+    // Sorteia as plantas
+    const sortear = (lista: string[]) => lista[Math.floor(Math.random() * lista.length)];
+    const novoPlano = {
+      emergente: sortear(PLANTS_DATA.EMERGENTE),
+      alto: sortear(PLANTS_DATA.ALTO),
+      medio: sortear(PLANTS_DATA.MEDIO),
+      baixo: sortear(PLANTS_DATA.BAIXO)
+    };
+
+    // Se o usuário estiver logado, salva no banco de dados
+    if (user) {
+      try {
+        const { error } = await supabase
+          .from('projetos')
+          .insert([
+            { 
+              user_id: user.id, 
+              area: area,
+              emergente: novoPlano.emergente,
+              alto: novoPlano.alto,
+              medio: novoPlano.medio,
+              baixo: novoPlano.baixo
+            }
+          ]);
+        
+        if (error) console.error("Erro ao salvar projeto:", error.message);
+      } catch (err) {
+        console.error("Erro na conexão:", err);
+      }
+    }
+
+    // Simula um carregamento visual e mostra o resultado
     setTimeout(() => {
-      const sortear = (lista: string[]) => lista[Math.floor(Math.random() * lista.length)];
-      setResult({
-        emergente: sortear(PLANTS_DATA.EMERGENTE),
-        alto: sortear(PLANTS_DATA.ALTO),
-        medio: sortear(PLANTS_DATA.MEDIO),
-        baixo: sortear(PLANTS_DATA.BAIXO)
-      });
+      setResult(novoPlano);
       setLoading(false);
       setStep('results');
-    }, 1500);
+    }, 1200);
   };
 
-  // Se o Auth estiver carregando, mostra o spinner
   if (authLoading) return (
     <div className="min-h-screen flex items-center justify-center bg-stone-50">
       <Loader2 className="animate-spin text-green-600 w-10 h-10" />
@@ -86,24 +110,36 @@ function AppContent() {
 
       {step === 'hero' && (
         <div className="py-32 px-4 text-center bg-stone-900 text-white">
-          <h1 className="text-5xl font-black mb-6 uppercase">Sua Floresta Inteligente</h1>
-          <p className="mb-8 text-stone-400 max-w-md mx-auto uppercase text-xs tracking-widest font-bold">Planejamento agroflorestal baseado em sucessão natural</p>
-          <button onClick={() => setStep('form')} className="px-10 py-5 bg-green-600 rounded-full font-bold text-xl hover:bg-green-500 transition-all shadow-xl">
-            COMEÇAR
+          <h1 className="text-5xl font-black mb-6 uppercase tracking-tighter">Sua Floresta Inteligente</h1>
+          <p className="mb-10 text-stone-400 max-w-md mx-auto uppercase text-[10px] tracking-[0.2em] font-bold leading-relaxed">
+            Planejamento agroflorestal baseado em sucessão natural e estratificação
+          </p>
+          <button onClick={() => setStep('form')} className="px-12 py-6 bg-green-600 rounded-full font-black text-xl hover:bg-green-500 transition-all shadow-[0_20px_50px_rgba(22,_163,_74,_0.3)] hover:-translate-y-1">
+            COMEÇAR AGORA
           </button>
         </div>
       )}
 
       {step === 'form' && (
         <div className="py-12 px-4 max-w-3xl mx-auto">
-          <div className="bg-white rounded-[2.5rem] shadow-xl p-8 border border-stone-100">
-            <h2 className="text-2xl font-black text-center mb-8 uppercase text-stone-800">Configurações</h2>
-            <div className="mb-8">
-              <label className="block text-[10px] font-black text-stone-400 mb-2 uppercase tracking-widest text-left">Área Total (m²)</label>
-              <input type="number" className="w-full p-4 bg-stone-50 border rounded-2xl outline-none focus:border-green-500" placeholder="Ex: 1000" value={area} onChange={(e) => setArea(e.target.value)} />
+          <div className="bg-white rounded-[3rem] shadow-2xl p-10 border border-stone-100">
+            <h2 className="text-2xl font-black text-center mb-10 uppercase text-stone-800 tracking-tight">Configurações do Plantio</h2>
+            <div className="mb-10">
+              <label className="block text-[10px] font-black text-stone-400 mb-3 uppercase tracking-widest text-left ml-2">Área Estimada (m²)</label>
+              <input 
+                type="number" 
+                className="w-full p-5 bg-stone-50 border-2 border-stone-100 rounded-3xl outline-none focus:border-green-500 focus:bg-white transition-all text-xl font-bold" 
+                placeholder="Ex: 1000" 
+                value={area} 
+                onChange={(e) => setArea(e.target.value)} 
+              />
             </div>
-            <button onClick={gerarPlano} disabled={loading || !area} className="w-full py-5 bg-green-700 text-white font-black rounded-2xl shadow-xl hover:bg-green-800 disabled:bg-stone-300">
-              {loading ? <Loader2 className="animate-spin mx-auto" /> : 'GERAR MEU PLANO'}
+            <button 
+              onClick={gerarPlano} 
+              disabled={loading || !area} 
+              className="w-full py-6 bg-green-700 text-white font-black rounded-3xl shadow-xl hover:bg-green-800 disabled:bg-stone-200 disabled:text-stone-400 transition-all uppercase tracking-widest text-sm"
+            >
+              {loading ? <Loader2 className="animate-spin mx-auto" /> : 'GERAR MEU PLANO SINTRÓPICO'}
             </button>
           </div>
         </div>
@@ -111,46 +147,43 @@ function AppContent() {
 
       {step === 'results' && result && (
         <div className="py-12 px-4 max-w-4xl mx-auto text-center">
-          <h3 className="text-3xl font-black uppercase mb-8">Design Gerado</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10 text-left">
-            <div className="bg-white p-6 rounded-3xl border shadow-sm flex items-center gap-4">
-               <div className="bg-green-50 p-3 rounded-2xl">
-                 <TreeDeciduous className="text-green-600" />
-               </div>
-               <div>
-                 <p className="text-[10px] uppercase font-black text-stone-300">Emergente</p>
-                 <p className="font-black text-xl">{result.emergente}</p>
-               </div>
-            </div>
-            <div className="bg-white p-6 rounded-3xl border shadow-sm flex items-center gap-4">
-               <div className="bg-green-50 p-3 rounded-2xl">
-                 <TreeDeciduous className="text-green-600" />
-               </div>
-               <div>
-                 <p className="text-[10px] uppercase font-black text-stone-300">Alto</p>
-                 <p className="font-black text-xl">{result.alto}</p>
-               </div>
-            </div>
-            <div className="bg-white p-6 rounded-3xl border shadow-sm flex items-center gap-4">
-               <div className="bg-green-50 p-3 rounded-2xl">
-                 <Sprout className="text-green-600" />
-               </div>
-               <div>
-                 <p className="text-[10px] uppercase font-black text-stone-300">Médio</p>
-                 <p className="font-black text-xl">{result.medio}</p>
-               </div>
-            </div>
-            <div className="bg-white p-6 rounded-3xl border shadow-sm flex items-center gap-4">
-               <div className="bg-green-50 p-3 rounded-2xl">
-                 <Carrot className="text-green-600" />
-               </div>
-               <div>
-                 <p className="text-[10px] uppercase font-black text-stone-300">Baixo</p>
-                 <p className="font-black text-xl">{result.baixo}</p>
-               </div>
-            </div>
+          <div className="inline-block px-4 py-1 bg-green-100 text-green-700 rounded-full text-[10px] font-black uppercase tracking-widest mb-4">
+            Design de Sucessão
           </div>
-          <button onClick={() => setStep('form')} className="text-green-700 font-bold underline">Criar Novo Design</button>
+          <h3 className="text-4xl font-black uppercase mb-12 tracking-tighter text-stone-800">Sistema Recomendado</h3>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-12 text-left">
+            {[
+              { label: 'Emergente', plant: result.emergente, icon: <TreeDeciduous />, color: 'bg-emerald-50' },
+              { label: 'Alto', plant: result.alto, icon: <TreeDeciduous />, color: 'bg-green-50' },
+              { label: 'Médio', plant: result.medio, icon: <Sprout />, color: 'bg-lime-50' },
+              { label: 'Baixo', plant: result.baixo, icon: <Carrot />, color: 'bg-amber-50' }
+            ].map((item, idx) => (
+              <div key={idx} className="bg-white p-8 rounded-[2rem] border-2 border-stone-50 shadow-sm hover:shadow-md transition-all flex items-center gap-6">
+                <div className={`${item.color} p-4 rounded-2xl text-green-600`}>
+                  {item.icon}
+                </div>
+                <div>
+                  <p className="text-[10px] uppercase font-black text-stone-300 tracking-widest">{item.label}</p>
+                  <p className="font-black text-2xl text-stone-800">{item.plant}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex flex-col items-center gap-6">
+            <button 
+              onClick={() => setStep('form')} 
+              className="px-8 py-4 bg-stone-900 text-white font-black rounded-2xl hover:bg-stone-800 transition-all uppercase text-xs tracking-widest"
+            >
+              Novo Plano
+            </button>
+            {user && (
+              <p className="text-[10px] text-stone-400 font-bold uppercase tracking-tight">
+                ✓ Este plano foi salvo automaticamente na sua conta
+              </p>
+            )}
+          </div>
         </div>
       )}
     </div>
