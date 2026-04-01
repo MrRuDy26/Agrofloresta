@@ -22,9 +22,18 @@ function AppContent() {
   const { user, signOut, loading: authLoading } = useAuth();
 
   const handleGoogleLogin = async () => {
+    // Aqui garantimos que ele sempre volte para a página atual, seja local ou na Vercel
+    const redirectUrl = window.location.origin;
+    
     await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: window.location.origin }
+      options: { 
+        redirectTo: redirectUrl,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
+      }
     });
   };
 
@@ -43,6 +52,7 @@ function AppContent() {
     }, 1500);
   };
 
+  // Se o Auth estiver carregando, mostra o spinner
   if (authLoading) return (
     <div className="min-h-screen flex items-center justify-center bg-stone-50">
       <Loader2 className="animate-spin text-green-600 w-10 h-10" />
@@ -62,12 +72,12 @@ function AppContent() {
                <span className="text-[10px] font-bold text-stone-500 hidden sm:block uppercase tracking-widest">
                 {user.email?.split('@')[0]}
               </span>
-              <button onClick={() => signOut()} className="text-stone-500 hover:text-red-600">
+              <button onClick={() => signOut()} className="text-stone-500 hover:text-red-600 p-2 hover:bg-red-50 rounded-full transition-colors">
                 <LogOut className="w-5 h-5" />
               </button>
             </div>
           ) : (
-            <button onClick={handleGoogleLogin} className="text-xs font-bold bg-stone-100 px-4 py-2 rounded-xl flex items-center gap-2 border border-stone-200">
+            <button onClick={handleGoogleLogin} className="text-xs font-bold bg-stone-100 px-4 py-2 rounded-xl flex items-center gap-2 border border-stone-200 hover:bg-stone-200 transition-all">
               <LogIn className="w-4 h-4" /> ENTRAR
             </button>
           )}
@@ -77,6 +87,7 @@ function AppContent() {
       {step === 'hero' && (
         <div className="py-32 px-4 text-center bg-stone-900 text-white">
           <h1 className="text-5xl font-black mb-6 uppercase">Sua Floresta Inteligente</h1>
+          <p className="mb-8 text-stone-400 max-w-md mx-auto uppercase text-xs tracking-widest font-bold">Planejamento agroflorestal baseado em sucessão natural</p>
           <button onClick={() => setStep('form')} className="px-10 py-5 bg-green-600 rounded-full font-bold text-xl hover:bg-green-500 transition-all shadow-xl">
             COMEÇAR
           </button>
@@ -91,7 +102,7 @@ function AppContent() {
               <label className="block text-[10px] font-black text-stone-400 mb-2 uppercase tracking-widest text-left">Área Total (m²)</label>
               <input type="number" className="w-full p-4 bg-stone-50 border rounded-2xl outline-none focus:border-green-500" placeholder="Ex: 1000" value={area} onChange={(e) => setArea(e.target.value)} />
             </div>
-            <button onClick={gerarPlano} disabled={loading || !area} className="w-full py-5 bg-green-700 text-white font-black rounded-2xl shadow-xl">
+            <button onClick={gerarPlano} disabled={loading || !area} className="w-full py-5 bg-green-700 text-white font-black rounded-2xl shadow-xl hover:bg-green-800 disabled:bg-stone-300">
               {loading ? <Loader2 className="animate-spin mx-auto" /> : 'GERAR MEU PLANO'}
             </button>
           </div>
@@ -103,21 +114,43 @@ function AppContent() {
           <h3 className="text-3xl font-black uppercase mb-8">Design Gerado</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10 text-left">
             <div className="bg-white p-6 rounded-3xl border shadow-sm flex items-center gap-4">
-               <TreeDeciduous className="text-green-600" />
+               <div className="bg-green-50 p-3 rounded-2xl">
+                 <TreeDeciduous className="text-green-600" />
+               </div>
                <div>
                  <p className="text-[10px] uppercase font-black text-stone-300">Emergente</p>
                  <p className="font-black text-xl">{result.emergente}</p>
                </div>
             </div>
             <div className="bg-white p-6 rounded-3xl border shadow-sm flex items-center gap-4">
-               <TreeDeciduous className="text-green-600" />
+               <div className="bg-green-50 p-3 rounded-2xl">
+                 <TreeDeciduous className="text-green-600" />
+               </div>
                <div>
                  <p className="text-[10px] uppercase font-black text-stone-300">Alto</p>
                  <p className="font-black text-xl">{result.alto}</p>
                </div>
             </div>
+            <div className="bg-white p-6 rounded-3xl border shadow-sm flex items-center gap-4">
+               <div className="bg-green-50 p-3 rounded-2xl">
+                 <Sprout className="text-green-600" />
+               </div>
+               <div>
+                 <p className="text-[10px] uppercase font-black text-stone-300">Médio</p>
+                 <p className="font-black text-xl">{result.medio}</p>
+               </div>
+            </div>
+            <div className="bg-white p-6 rounded-3xl border shadow-sm flex items-center gap-4">
+               <div className="bg-green-50 p-3 rounded-2xl">
+                 <Carrot className="text-green-600" />
+               </div>
+               <div>
+                 <p className="text-[10px] uppercase font-black text-stone-300">Baixo</p>
+                 <p className="font-black text-xl">{result.baixo}</p>
+               </div>
+            </div>
           </div>
-          <button onClick={() => setStep('form')} className="text-green-700 font-bold underline">Novo Plano</button>
+          <button onClick={() => setStep('form')} className="text-green-700 font-bold underline">Criar Novo Design</button>
         </div>
       )}
     </div>
