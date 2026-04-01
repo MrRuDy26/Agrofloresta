@@ -15,13 +15,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // 1. Verifica se já existe uma sessão ativa ao abrir o app
+    // Busca a sessão inicial
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       setLoading(false);
     });
 
-    // 2. Fica ouvindo mudanças (Login, Logout, Troca de senha)
+    // Escuta mudanças de autenticação
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       setLoading(false);
@@ -41,7 +41,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
-// Hook personalizado para facilitar o uso nos outros arquivos
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
